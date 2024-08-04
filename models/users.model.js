@@ -29,27 +29,35 @@ const usersModel = sequelize.define("users", {
     },
 });
 
-// const products = (name) => {
-//     const productModel = sequelize.define(name, {
-//         _id: {
-//             type: Sequelize.UUID,
-//             primaryKey: true,
-//             defaultValue: Sequelize.UUIDV4,
-//         },
-//         name: {
-//             type: Sequelize.STRING,
-//             allowNull: false,
-//         },
-//         description: {
-//             type: Sequelize.STRING,
-//             allowNull: false,
-//         },
-//         price: {
-//             type: Sequelize.STRING,
-//             allowNull: false,
-//         },
-//     });
-// }
+const productsModel = async (name) => {
+    const normalizedName = name.replace(/\s+/g, '_').toLowerCase();
+    const products = sequelize.define(
+        normalizedName,
+        {
+            _id: {
+                type: Sequelize.UUID,
+                primaryKey: true,
+                defaultValue: Sequelize.UUIDV4,
+            },
+            name: {
+                type: Sequelize.STRING,
+                allowNull: false,
+                unique: true
+            },
+            description: {
+                type: Sequelize.STRING,
+                allowNull: false,
+            },
+            price: {
+                type: Sequelize.STRING,
+                allowNull: false,
+            },
+        },
+        { timestamps: true }
+    );
+    await products.sync();
+    return products;
+}
 
 sequelize.sync()
     .then((results) => {
@@ -58,4 +66,4 @@ sequelize.sync()
         console.log(error);
     });
 
-module.exports = usersModel;
+module.exports = {usersModel, productsModel};

@@ -2,12 +2,11 @@ const jwt = require("jsonwebtoken");
 const saltRounds = Number(process.env.SALT_ROUNDS);
 const bcrypt = require("bcrypt");
 const jwt_secrete_key = process.env.SEC_KEY;
-const Sequelize = require("sequelize");
-const sequelize = require("../Config/db");
-const usersModel = require("../models/users.model");
+const {usersModel, productsModel} = require("../models/users.model");
 
 const home = async (req, res) => {
-    res.json("hello world");
+    // const userData = await usersModel.findByPk(req.id.user);
+    res.json('userData');
 }
 
 const signup = async (req, res) => {
@@ -44,30 +43,33 @@ const signin = async (req, res) => {
 const dashboard = async (req, res) => {
     const userData = await usersModel.findByPk(req.id.user);
     const productNameModel = `${userData.company}_products`;
-    const productsModel = sequelize.define(productNameModel, {
-        _id: {
-            type: Sequelize.UUID,
-            primaryKey: true,
-            defaultValue: Sequelize.UUIDV4,
-        },
-        name: {
-            type: Sequelize.STRING,
-            allowNull: false,
-        },
-        description: {
-            type: Sequelize.STRING,
-            allowNull: false,
-        },
-        price: {
-            type: Sequelize.STRING,
-            allowNull: false,
-        },
-    }, {timestamps:true});
-    res.json(userData);
+    const productModel = productsModel(productNameModel);
+    if (req.method == "POST") {
+        try {
+            await (await productModel).create(req.body);
+            res.json({ message: `Successfully added ${req.body.name} to the database` });
+        } catch (err) {
+            res.json({ message: err.original.sqlMessage });
+        }
+    } else {
+        const products = await (await productModel).findAll();
+        res.json({ "Agent Details": userData, "Company Products": products });
+    }
+}
+
+const products = async (req, res) => {
+    const productModel = productsModel(`${req.params.subdomain}_products`);
+    const products = await (await productModel).findAll();
+    res.json({company:req.params.subdomain, products:products});
 }
 
 const company = async (req, res) => {
-    res.json("company info");
+    console.log(req.method);
+    if (req.method == "POST") {
+        res.json("endpoint accessed through post method");
+    } else {
+        res.json("company info");
+    }
 };
 
 module.exports = {
@@ -75,5 +77,6 @@ module.exports = {
     signup,
     signin,
     dashboard,
-    company
+    company,
+    products
 }
