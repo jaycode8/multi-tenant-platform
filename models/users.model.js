@@ -23,11 +23,37 @@ const usersModel = sequelize.define("users", {
         type: Sequelize.STRING,
         allowNull: false,
     },
+    subdomain: {
+        type: Sequelize.STRING,
+        allowNull: true,
+    },
 });
+
+// const products = (name) => {
+//     const productModel = sequelize.define(name, {
+//         _id: {
+//             type: Sequelize.UUID,
+//             primaryKey: true,
+//             defaultValue: Sequelize.UUIDV4,
+//         },
+//         name: {
+//             type: Sequelize.STRING,
+//             allowNull: false,
+//         },
+//         description: {
+//             type: Sequelize.STRING,
+//             allowNull: false,
+//         },
+//         price: {
+//             type: Sequelize.STRING,
+//             allowNull: false,
+//         },
+//     });
+// }
 
 sequelize.sync()
     .then((results) => {
-        console.log("table users created successfully");
+        console.log("tables created successfully");
     }).catch((error) => {
         console.log(error);
     });
