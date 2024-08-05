@@ -63,20 +63,10 @@ const products = async (req, res) => {
     res.json({company:req.params.subdomain, products:products});
 }
 
-const company = async (req, res) => {
-    console.log(req.method);
-    if (req.method == "POST") {
-        res.json("endpoint accessed through post method");
-    } else {
-        res.json("company info");
-    }
-};
-
 module.exports = {
     home,
     signup,
     signin,
     dashboard,
-    company,
     products
 }
