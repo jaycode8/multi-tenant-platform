@@ -1,6 +1,13 @@
-const subdomain_router = require("express").Router();
-const { productsB } = require("../Controlers/company.controlers");
+const router = require("express").Router();
+const verifyToken = require("../Config/tk");
+const verifySubDomain = require("../Config/subdomain");
+const { main, dashboard } = require("../Controlers/company.controlers");
 
-subdomain_router.get('/jay', productsB);
+router.use(verifySubDomain);
 
-module.exports = subdomain_router;
+router.get('/', main);
+router.route("/dashboard")
+    .get(verifyToken, dashboard)
+    .post(verifyToken, dashboard);
+
+module.exports = router;

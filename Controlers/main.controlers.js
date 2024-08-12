@@ -5,15 +5,13 @@ const jwt_secrete_key = process.env.SEC_KEY;
 const {usersModel, productsModel} = require("../models/users.model");
 
 const home = async (req, res) => {
-    // const userData = await usersModel.findByPk(req.id.user);
-    res.json('userData');
+    res.json('welcome to this multitenant application');
 }
 
 const signup = async (req, res) => {
     try {
         req.body.password = await bcrypt.hash(req.body.password, saltRounds);
-        // req.body.subdomain = `${req.body.company}.${process.env.main_domain}`;
-        req.body.subdomain = `${process.env.main_domain}${req.body.company}`;
+        req.body.subdomain = `${req.body.company}.${process.env.main_domain}`;
         await usersModel.create(req.body);
         res.json({message:"successfully added new user"});
     } catch (error) {
@@ -41,32 +39,12 @@ const signin = async (req, res) => {
 }
 
 const dashboard = async (req, res) => {
-    const userData = await usersModel.findByPk(req.id.user);
-    const productNameModel = `${userData.company}_products`;
-    const productModel = productsModel(productNameModel);
-    if (req.method == "POST") {
-        try {
-            await (await productModel).create(req.body);
-            res.json({ message: `Successfully added ${req.body.name} to the database` });
-        } catch (err) {
-            res.json({ message: err.original.sqlMessage });
-        }
-    } else {
-        const products = await (await productModel).findAll();
-        res.json({ "Agent Details": userData, "Company Products": products });
-    }
-}
-
-const products = async (req, res) => {
-    const productModel = productsModel(`${req.params.subdomain}_products`);
-    const products = await (await productModel).findAll();
-    res.json({company:req.params.subdomain, products:products});
+    res.json("admin dashboard");
 }
 
 module.exports = {
     home,
     signup,
     signin,
-    dashboard,
-    products
+    dashboard
 }
